@@ -20,7 +20,8 @@ ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 RUN npm run build
 
 # ── Stage 2: runtime ────────────────────────────────────────────────────────
-FROM php:8.3-fpm-alpine AS runtime
+# Lock file memerlukan PHP >= 8.4 (Laravel 13 / dependencies terkini)
+FROM php:8.4-fpm-alpine AS runtime
 
 RUN apk add --no-cache \
     nginx \
@@ -58,8 +59,7 @@ RUN composer install \
     --no-interaction \
     --no-scripts \
     --prefer-dist \
-    --optimize-autoloader \
-    --ignore-platform-reqs
+    --optimize-autoloader
 
 # Aplikasi
 COPY . .
