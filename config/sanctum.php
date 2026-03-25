@@ -3,7 +3,36 @@
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Laravel\Sanctum\Http\Middleware\AuthenticateSession;
-use Laravel\Sanctum\Sanctum;
+
+$statefulHostsFromUrl = static function (string $url): array {
+    $url = trim($url);
+    if ($url === '') {
+        return [];
+    }
+
+    $parts = parse_url($url);
+    if (empty($parts['host'])) {
+        return [];
+    }
+
+    $host = $parts['host'];
+    $port = isset($parts['port']) ? (int) $parts['port'] : null;
+
+    $hosts = [$host];
+    if ($port !== null && ! in_array($port, [80, 443], true)) {
+        $hosts[] = "{$host}:{$port}";
+    }
+
+    return $hosts;
+};
+
+$statefulDefaults = array_values(array_unique(array_filter(array_merge(
+    ['localhost', 'localhost:3000', '127.0.0.1', '127.0.0.1:8000', '::1'],
+    $statefulHostsFromUrl((string) env('APP_URL', '')),
+    $statefulHostsFromUrl((string) env('FRONTEND_URL', '')),
+))));
+
+$statefulFromEnv = array_filter(array_map('trim', explode(',', (string) env('SANCTUM_STATEFUL_DOMAINS', ''))));
 
 return [
 
@@ -16,14 +45,12 @@ return [
     | authentication cookies. Typically, these should include your local
     | and production domains which access your API via a frontend SPA.
     |
+    | Hosts from APP_URL and FRONTEND_URL are merged automatically so deploys
+    | work when SANCTUM_STATEFUL_DOMAINS is unset (e.g. Coolify + same host).
+    |
     */
 
-    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
-        '%s%s',
-        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
-        Sanctum::currentApplicationUrlWithPort(),
-        // Sanctum::currentRequestHost(),
-    ))),
+    'stateful' => array_values(array_unique(array_merge($statefulDefaults, $statefulFromEnv))),
 
     /*
     |--------------------------------------------------------------------------

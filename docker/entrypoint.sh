@@ -3,6 +3,13 @@ set -e
 
 cd /var/www/html
 
+if [ -z "${APP_KEY:-}" ]; then
+    echo "eMP: FATAL — APP_KEY is empty. Set APP_KEY in Coolify (Build/Environment)." >&2
+    echo "eMP: Generate one locally: php artisan key:generate --show" >&2
+    echo "eMP: Or in container once: php artisan key:generate --force (then persist the value)." >&2
+    exit 1
+fi
+
 LISTEN_PORT="${PORT:-80}"
 if [ -f /etc/nginx/templates/default.conf ]; then
   mkdir -p /etc/nginx/http.d
