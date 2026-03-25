@@ -16,6 +16,9 @@
 /public/build
 /public/hot
 /public/storage
+# Hasil Vite yang disalin ke public (contoh: imej Docker)
+/public/index.html
+/public/assets
 /storage/*.key
 /storage/pail
 /vendor
