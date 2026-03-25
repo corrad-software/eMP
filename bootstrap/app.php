@@ -3,6 +3,10 @@
 use App\Http\Middleware\CamelCaseMiddleware;
 use App\Http\Middleware\CheckPermission;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
@@ -31,6 +35,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
 
         $middleware->statefulApi();
+
+        // Cookie + session + CSRF for all API routes: SPA login uses /api/auth/* but Sanctum only
+        // loads this stack when Origin/Referer match stateful domains (often fails behind proxies /
+        // www mismatch). Starting the session here matches same-origin deploys (Docker + Coolify).
+        $middleware->prependToGroup('api', [
+            EncryptCookies::class,
+            AddQueuedCookiesToResponse::class,
+            StartSession::class,
+            ValidateCsrfToken::class,
+        ]);
 
         $middleware->alias([
             'permission' => CheckPermission::class,
