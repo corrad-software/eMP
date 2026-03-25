@@ -1,19 +1,29 @@
 import type { Component } from "vue";
 import {
+  BarChart3,
   BookOpen,
   Bot,
   Cable,
+  Calendar,
+  ClipboardList,
   Cog,
   Database,
   Eye,
+  FileInput,
+  FileSearch,
   FileText,
   Gauge,
+  Gavel,
+  Globe,
   Image,
   LayoutGrid,
   Link2,
   ListChecks,
   Mail,
   Menu,
+  MessageSquare,
+  Monitor,
+  Scale,
   Settings,
   Shield,
 } from "lucide-vue-next";
@@ -56,8 +66,9 @@ export const DEFAULT_MENU: MenuGroupDef[] = [
   },
   {
     id: "portal",
-    label: "Webfront",
+    label: "Portal & Kandungan",
     items: [
+      { id: "portal-site", label: "Lihat Portal", to: "/portal", icon: Globe },
       { id: "dashboard", label: "Dashboard", to: "/admin/portal/dashboard", icon: Gauge },
       {
         id: "posts",
@@ -89,6 +100,107 @@ export const DEFAULT_MENU: MenuGroupDef[] = [
       },
       { id: "storefront-menu", label: "Menus", to: "/admin/webfront-menu", icon: Link2 },
       { id: "webfront-settings", label: "Settings", to: "/admin/webfront-settings", icon: Settings },
+    ],
+  },
+  {
+    id: "pengurusan-kes",
+    label: "Pengurusan Kes",
+    items: [
+      {
+        id: "pendaftaran-kes",
+        label: "Pendaftaran Kes",
+        to: "/admin/kes/daftar",
+        icon: ClipboardList,
+        children: [
+          { id: "kes-daftar-senarai", label: "Senarai Pendaftaran", to: "/admin/kes/daftar" },
+          { id: "kes-daftar-baru", label: "Daftar Baru", to: "/admin/kes/daftar/baru" },
+        ],
+      },
+      {
+        id: "pengurusan-kes-item",
+        label: "Pengurusan Kes",
+        to: "/admin/kes",
+        icon: Gavel,
+        children: [
+          { id: "kes-senarai", label: "Semua Kes", to: "/admin/kes" },
+        ],
+      },
+      {
+        id: "perjanjian-kolektif",
+        label: "Perjanjian Kolektif",
+        to: "/admin/kes/ca",
+        icon: Scale,
+        children: [
+          { id: "ca-senarai", label: "Semua CA", to: "/admin/kes/ca" },
+          { id: "ca-baru", label: "Daftar Baru", to: "/admin/kes/ca/baru" },
+        ],
+      },
+      {
+        id: "efiling",
+        label: "e-Filing & e-Services",
+        to: "/admin/efiling",
+        icon: FileInput,
+        children: [
+          { id: "efiling-senarai", label: "Semua Pemfailan", to: "/admin/efiling" },
+          { id: "efiling-baru", label: "Pemfailan Baru", to: "/admin/efiling/baru" },
+        ],
+      },
+      {
+        id: "esebutan",
+        label: "e-Sebutan",
+        to: "/admin/esebutan",
+        icon: MessageSquare,
+      },
+    ],
+  },
+  {
+    id: "operasi-mahkamah",
+    label: "Operasi Mahkamah",
+    items: [
+      {
+        id: "notis",
+        label: "Pengurusan Notis",
+        to: "/admin/notis",
+        icon: ListChecks,
+        children: [
+          { id: "notis-dashboard", label: "Dashboard Kerja", to: "/admin/notis" },
+          { id: "notis-tetapan", label: "Tetapan Notis", to: "/admin/notis/tetapan" },
+        ],
+      },
+      {
+        id: "jadual",
+        label: "Jadual Mahkamah",
+        to: "/admin/jadual",
+        icon: Calendar,
+      },
+      {
+        id: "carian-pintar",
+        label: "Carian Pintar",
+        to: "/admin/carian",
+        icon: FileSearch,
+      },
+      {
+        id: "signage",
+        label: "Paparan Digital",
+        to: "/admin/signage",
+        icon: Monitor,
+      },
+    ],
+  },
+  {
+    id: "analitik",
+    label: "Analitik",
+    items: [
+      {
+        id: "laporan",
+        label: "Dashboard & Laporan",
+        to: "/admin/laporan",
+        icon: BarChart3,
+        children: [
+          { id: "laporan-dashboard", label: "Dashboard KPI", to: "/admin/laporan" },
+          { id: "laporan-senarai", label: "Senarai Laporan", to: "/admin/laporan/senarai" },
+        ],
+      },
     ],
   },
   {

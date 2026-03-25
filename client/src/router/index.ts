@@ -195,6 +195,85 @@ const router = createRouter({
       redirect: (to: RouteLocationGeneric) => `/admin${to.fullPath}`,
     })),
 
+    // ═══════════════════════════════════════════════════════════
+    // eMP v2.0 — Module Routes (UI Mockups)
+    // ═══════════════════════════════════════════════════════════
+
+    // ── Module 1: Portal eMP (public) ──
+    { path: "/portal", name: "portal-home", component: () => import("@/views/portal/PortalHomeView.vue"), meta: { title: "Portal eMP" } },
+    { path: "/portal/efiling", name: "portal-efiling", component: () => import("@/views/portal/PortalEfilingView.vue"), meta: { title: "Pemfailan Dalam Talian" } },
+    { path: "/portal/carian", name: "portal-search", component: () => import("@/views/portal/PortalSearchView.vue"), meta: { title: "Carian Kes" } },
+    { path: "/portal/jadual", name: "portal-schedule", component: () => import("@/views/portal/PortalScheduleView.vue"), meta: { title: "Jadual Mahkamah" } },
+    { path: "/portal/award", name: "portal-awards", component: () => import("@/views/portal/PortalAwardsView.vue"), meta: { title: "Carian Award" } },
+    { path: "/portal/kes/:id", name: "portal-case-detail", component: () => import("@/views/portal/PortalCaseDetailView.vue"), meta: { title: "Butiran Kes" } },
+    { path: "/portal/faq", name: "portal-faq", component: () => import("@/views/portal/PortalFaqView.vue"), meta: { title: "Soalan Lazim" } },
+    { path: "/portal/hubungi", name: "portal-contact", component: () => import("@/views/portal/PortalContactView.vue"), meta: { title: "Hubungi Kami" } },
+    { path: "/portal/ca", name: "portal-ca", component: () => import("@/views/portal/PortalCaListView.vue"), meta: { title: "Perjanjian Kolektif" } },
+    { path: "/portal/kebolehcapaian", name: "portal-accessibility", component: () => import("@/views/portal/PortalAccessibilityView.vue"), meta: { title: "Kebolehcapaian" } },
+    { path: "/portal/log-masuk", name: "portal-login", component: () => import("@/views/portal/PortalLoginView.vue"), meta: { title: "Log Masuk" } },
+    { path: "/portal/daftar", name: "portal-register", component: () => import("@/views/portal/PortalRegisterView.vue"), meta: { title: "Daftar Akaun" } },
+
+    // ── Module 2: Pengurusan Akses Berpusat ──
+    { path: "/admin/mfa-verify", name: "mfa-verify", component: () => import("@/views/auth/MfaVerifyView.vue"), meta: { guestOnly: true, title: "Pengesahan MFA" } },
+
+    // ── Module 3: Pengurusan Notis ──
+    { path: "/admin/notis", name: "notis-dashboard", component: () => import("@/views/notis/NotisWorkDashboardView.vue"), meta: { requiresAuth: true, title: "Pengurusan Notis" } },
+    { path: "/admin/notis/tetapan", name: "notis-settings", component: () => import("@/views/notis/NotisSettingsView.vue"), meta: { requiresAuth: true, title: "Tetapan Notis" } },
+
+    // ── Module 4: e-Filing & e-Services ──
+    { path: "/admin/efiling", name: "efiling-list", component: () => import("@/views/efiling/EfilingListView.vue"), meta: { requiresAuth: true, title: "e-Filing" } },
+    { path: "/admin/efiling/baru", name: "efiling-create", component: () => import("@/views/efiling/EfilingWizardView.vue"), meta: { requiresAuth: true, title: "Pemfailan Baru" } },
+    { path: "/admin/efiling/:id", name: "efiling-status", component: () => import("@/views/efiling/EfilingStatusView.vue"), meta: { requiresAuth: true, title: "Status Pemfailan" } },
+    { path: "/admin/efiling/:id/semak", name: "efiling-review", component: () => import("@/views/efiling/EfilingReviewView.vue"), meta: { requiresAuth: true, title: "Semakan Pemfailan" } },
+
+    // ── Module 5: e-Sebutan ──
+    { path: "/admin/esebutan", name: "sebutan-list", component: () => import("@/views/sebutan/SebutanListView.vue"), meta: { requiresAuth: true, title: "e-Sebutan" } },
+    { path: "/admin/esebutan/:id", name: "sebutan-session", component: () => import("@/views/sebutan/SebutanSessionView.vue"), meta: { requiresAuth: true, title: "Sesi Sebutan" } },
+    { path: "/admin/esebutan/:id/rumusan", name: "sebutan-summary", component: () => import("@/views/sebutan/SebutanSummaryView.vue"), meta: { requiresAuth: true, title: "Rumusan Sebutan" } },
+
+    // ── Module 6: Jadual Mahkamah ──
+    { path: "/admin/jadual", name: "jadual-calendar", component: () => import("@/views/jadual/JadualCalendarView.vue"), meta: { requiresAuth: true, title: "Jadual Mahkamah" } },
+    { path: "/admin/jadual/baru", name: "jadual-create", component: () => import("@/views/jadual/JadualEventEditorView.vue"), meta: { requiresAuth: true, title: "Acara Baru" } },
+    { path: "/admin/jadual/:id", name: "jadual-edit", component: () => import("@/views/jadual/JadualEventEditorView.vue"), meta: { requiresAuth: true, title: "Edit Acara" } },
+
+    // ── Module 7: Paparan Kandungan Digital ──
+    { path: "/admin/signage", name: "signage-dashboard", component: () => import("@/views/signage/SignageDashboardView.vue"), meta: { requiresAuth: true, title: "Paparan Digital" } },
+    { path: "/admin/signage/playlist/:id", name: "signage-playlist", component: () => import("@/views/signage/SignagePlaylistView.vue"), meta: { requiresAuth: true, title: "Senarai Main" } },
+    { path: "/admin/signage/preview/:id", name: "signage-preview", component: () => import("@/views/signage/SignagePreviewView.vue"), meta: { requiresAuth: true, title: "Pratonton" } },
+
+    // ── Module 8: Carian Pintar (Award) ──
+    { path: "/admin/carian", name: "carian-search", component: () => import("@/views/carian/CarianSearchView.vue"), meta: { requiresAuth: true, title: "Carian Pintar" } },
+    { path: "/admin/carian/:id", name: "carian-detail", component: () => import("@/views/carian/CarianDetailView.vue"), meta: { requiresAuth: true, title: "Butiran Award" } },
+
+    // ── Module 9: Pendaftaran Kes ──
+    { path: "/admin/kes/daftar", name: "kes-daftar-list", component: () => import("@/views/kes/KesDaftarListView.vue"), meta: { requiresAuth: true, title: "Pendaftaran Kes" } },
+    { path: "/admin/kes/daftar/baru", name: "kes-daftar-create", component: () => import("@/views/kes/KesDaftarFormView.vue"), meta: { requiresAuth: true, title: "Daftar Kes Baru" } },
+    { path: "/admin/kes/daftar/:id/lulusan", name: "kes-daftar-approval", component: () => import("@/views/kes/KesDaftarApprovalView.vue"), meta: { requiresAuth: true, title: "Kelulusan Kes" } },
+
+    // ── Module 11: Perjanjian Kolektif (must be before /admin/kes/:id to avoid param collision) ──
+    { path: "/admin/kes/ca", name: "ca-list", component: () => import("@/views/ca/CaListView.vue"), meta: { requiresAuth: true, title: "Perjanjian Kolektif" } },
+    { path: "/admin/kes/ca/baru", name: "ca-create", component: () => import("@/views/ca/CaFormView.vue"), meta: { requiresAuth: true, title: "Daftar CA Baru" } },
+    { path: "/admin/kes/ca/:id", name: "ca-detail", component: () => import("@/views/ca/CaDetailView.vue"), meta: { requiresAuth: true, title: "Butiran CA" } },
+
+    // ── Module 10: Pengurusan Kes (dynamic :id routes last) ──
+    { path: "/admin/kes", name: "kes-list", component: () => import("@/views/kes/KesListView.vue"), meta: { requiresAuth: true, title: "Pengurusan Kes" } },
+    { path: "/admin/kes/:id/award", name: "kes-award-draft", component: () => import("@/views/kes/KesAwardDraftView.vue"), meta: { requiresAuth: true, title: "Penulisan Award" } },
+    { path: "/admin/kes/:id", name: "kes-detail", component: () => import("@/views/kes/KesDetailView.vue"), meta: { requiresAuth: true, title: "Butiran Kes" } },
+    { path: "/admin/kes/:id/timeline", name: "kes-timeline", component: () => import("@/views/kes/KesTimelineView.vue"), meta: { requiresAuth: true, title: "Timeline Kes" } },
+    { path: "/admin/kes/:id/tugasan", name: "kes-tasking", component: () => import("@/views/kes/KesTaskingView.vue"), meta: { requiresAuth: true, title: "Tugasan Kes" } },
+
+    // ── Module 12: Dashboard dan Laporan ──
+    { path: "/admin/laporan", name: "laporan-dashboard", component: () => import("@/views/laporan/EmpDashboardView.vue"), meta: { requiresAuth: true, title: "Dashboard KPI" } },
+    { path: "/admin/laporan/senarai", name: "laporan-list", component: () => import("@/views/laporan/ReportsListView.vue"), meta: { requiresAuth: true, title: "Senarai Laporan" } },
+    { path: "/admin/laporan/:id", name: "laporan-detail", component: () => import("@/views/laporan/ReportDetailView.vue"), meta: { requiresAuth: true, title: "Butiran Laporan" } },
+
+    // ── Module 13: Pentadbir Sistem (additional views) ──
+    { path: "/admin/pentadbir/data-induk", name: "master-data", component: () => import("@/views/admin/MasterDataView.vue"), meta: { requiresAuth: true, title: "Data Induk" } },
+    { path: "/admin/pentadbir/templat", name: "template-admin", component: () => import("@/views/admin/TemplateAdminView.vue"), meta: { requiresAuth: true, title: "Templat" } },
+    { path: "/admin/pentadbir/integrasi", name: "integration-settings", component: () => import("@/views/admin/IntegrationSettingsView.vue"), meta: { requiresAuth: true, title: "Integrasi" } },
+    { path: "/admin/pentadbir/feature-toggles", name: "feature-toggles", component: () => import("@/views/admin/FeatureTogglesView.vue"), meta: { requiresAuth: true, title: "Feature Toggles" } },
+    { path: "/admin/pentadbir/housekeeping", name: "housekeeping", component: () => import("@/views/admin/HousekeepingView.vue"), meta: { requiresAuth: true, title: "Housekeeping" } },
+
     { path: "/", name: "storefront-home", component: StorefrontHomeView, meta: { title: "Webfront" } },
     { path: "/:slug", name: "storefront-page", component: StorefrontPageView, meta: { title: "Webfront" } },
   ],

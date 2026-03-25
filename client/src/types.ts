@@ -168,3 +168,214 @@ export type AuditLog = {
   createdAt: string;
   user?: { id: number; name: string; email: string } | null;
 };
+
+// ═══════════════════════════════════════════════════════════════
+// eMP v2.0 — Domain Types
+// ═══════════════════════════════════════════════════════════════
+
+// ── Case Management Core ──
+
+export type CaseStatus = "pending" | "registered" | "in-progress" | "hearing" | "decided" | "closed" | "archived";
+export type CaseType = "unfair-dismissal" | "trade-dispute" | "collective-agreement" | "non-compliance" | "other";
+
+export type Party = {
+  id: number;
+  name: string;
+  type: "claimant" | "respondent" | "representative";
+  icNumber?: string;
+  companyRegNo?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  lawyerName?: string;
+  lawyerFirm?: string;
+};
+
+export type CaseRecord = {
+  id: number;
+  caseNo: string;
+  caseType: CaseType;
+  subject: string;
+  description?: string;
+  priority: "normal" | "urgent";
+  status: CaseStatus;
+  parties: Party[];
+  referenceNo?: string;
+  registeredAt: string;
+  assignedChairmanId?: number;
+  assignedChairmanName?: string;
+  assignedRegistrarId?: number;
+  assignedRegistrarName?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CaseEvent = {
+  id: number;
+  caseId: number;
+  type: "registration" | "mention" | "hearing" | "decision" | "filing" | "note" | "assignment";
+  title: string;
+  description?: string;
+  actorName: string;
+  occurredAt: string;
+};
+
+// ── e-Filing ──
+
+export type FilingStatus = "draft" | "submitted" | "under-review" | "accepted" | "rejected" | "returned";
+
+export type FilingDocument = {
+  id: number;
+  filename: string;
+  originalName: string;
+  mimeType: string;
+  size: number;
+  url: string;
+  uploadedAt: string;
+};
+
+export type Filing = {
+  id: number;
+  caseId?: number;
+  caseNo?: string;
+  filingType: string;
+  status: FilingStatus;
+  referenceNo: string;
+  applicantName: string;
+  documents: FilingDocument[];
+  submittedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// ── Court Schedule ──
+
+export type ScheduleEventType = "mention" | "hearing" | "conference" | "mediation" | "administrative";
+export type ScheduleEventStatus = "scheduled" | "in-progress" | "completed" | "postponed" | "cancelled";
+
+export type ScheduleEvent = {
+  id: number;
+  caseId?: number;
+  caseNo?: string;
+  title: string;
+  type: ScheduleEventType;
+  venue: string;
+  courtRoom: string;
+  startAt: string;
+  endAt: string;
+  chairmanName?: string;
+  status: ScheduleEventStatus;
+};
+
+// ── e-Mention (e-Sebutan) ──
+
+export type MentionMessage = {
+  id: number;
+  mentionSessionId: number;
+  senderName: string;
+  senderRole: string;
+  content: string;
+  type: "message" | "system" | "decision";
+  sentAt: string;
+};
+
+export type MentionSession = {
+  id: number;
+  caseId: number;
+  caseNo: string;
+  status: "scheduled" | "in-progress" | "completed";
+  scheduledAt: string;
+  startedAt?: string;
+  endedAt?: string;
+  participants: { name: string; role: string; present: boolean }[];
+  messages: MentionMessage[];
+  decisions?: string[];
+};
+
+// ── Smart Search / Award ──
+
+export type AwardResult = {
+  id: number;
+  caseNo: string;
+  awardNo: string;
+  title: string;
+  snippet: string;
+  chairmanName: string;
+  decidedAt: string;
+  relevanceScore: number;
+  highlights: string[];
+  caseType: string;
+  year: number;
+};
+
+// ── Digital Signage ──
+
+export type SignageDevice = {
+  id: number;
+  name: string;
+  location: string;
+  status: "online" | "offline" | "maintenance";
+  lastHeartbeat?: string;
+  currentPlaylistId?: number;
+};
+
+export type SignageItem = {
+  id: number;
+  type: "schedule" | "announcement" | "image" | "html";
+  content: string;
+  duration: number;
+  order: number;
+};
+
+export type SignagePlaylist = {
+  id: number;
+  name: string;
+  items: SignageItem[];
+  isActive: boolean;
+};
+
+// ── Collective Agreement (Perjanjian Kolektif) ──
+
+export type CollectiveAgreementStatus = "submitted" | "under-review" | "registered" | "action-required" | "archived";
+
+export type CollectiveAgreement = {
+  id: number;
+  caNo: string;
+  employerName: string;
+  unionName: string;
+  industry: string;
+  status: CollectiveAgreementStatus;
+  effectiveFrom?: string;
+  effectiveTo?: string;
+  submittedAt: string;
+  registeredAt?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// ── Notices / Work Dashboard ──
+
+export type NoticeItem = {
+  id: number;
+  type: "task" | "reminder" | "sla-warning" | "new-case" | "system";
+  title: string;
+  description?: string;
+  relatedCaseId?: number;
+  relatedCaseNo?: string;
+  priority: "low" | "normal" | "high" | "critical";
+  dueAt?: string;
+  isRead: boolean;
+  createdAt: string;
+};
+
+// ── KPI / Reports ──
+
+export type KpiMetric = {
+  key: string;
+  label: string;
+  value: number;
+  target: number;
+  unit: string;
+  trend: "up" | "down" | "flat";
+  changePercent: number;
+};

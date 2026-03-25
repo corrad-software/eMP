@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { Bell, Check, ChevronDown, LogOut, Settings, Shield } from "lucide-vue-next";
+import { AlertTriangle, Bell, Check, ChevronDown, Clock, FileText, Gavel, LogOut, Settings, Shield, UserCheck } from "lucide-vue-next";
 
 import type { ThemeColor } from "@/types";
 import type { MenuItemDef, MenuNode } from "@/config/admin-menu";
@@ -27,6 +27,17 @@ const { isCollapsed, isCompact, toggle: toggleSidebar, toggleCompact } = useSide
 const settingsOpen = ref(false);
 const settingsDropdownRef = ref<HTMLElement | null>(null);
 
+const notificationsOpen = ref(false);
+const notificationsDropdownRef = ref<HTMLElement | null>(null);
+
+const notificationItems = [
+  { id: 1, title: "3 kes melebihi SLA sebutan", type: "sla-warning", time: "10 min lalu", icon: AlertTriangle, unread: true },
+  { id: 2, title: "Pemfailan baru EF-2026-000142 diterima", type: "filing", time: "30 min lalu", icon: FileText, unread: true },
+  { id: 3, title: "Sebutan MPM/4/2-1234 bermula dalam 1 jam", type: "reminder", time: "1 jam lalu", icon: Clock, unread: true },
+  { id: 4, title: "Award MPM/4/2-0567 telah dikeluarkan", type: "award", time: "2 jam lalu", icon: Gavel, unread: false },
+  { id: 5, title: "2 kes menunggu kelulusan YDP", type: "approval", time: "3 jam lalu", icon: UserCheck, unread: false },
+];
+
 const themeChoices: Array<{ label: string; value: ThemeColor }> = [
   { label: "Violet", value: "violet" },
   { label: "Blue", value: "blue" },
@@ -37,14 +48,19 @@ const themeChoices: Array<{ label: string; value: ThemeColor }> = [
 ];
 
 const handleDocumentClick = (event: MouseEvent) => {
-  if (!settingsOpen.value) return;
-  if (!settingsDropdownRef.value) return;
-  if (settingsDropdownRef.value.contains(event.target as Node)) return;
-  settingsOpen.value = false;
+  if (settingsOpen.value && settingsDropdownRef.value && !settingsDropdownRef.value.contains(event.target as Node)) {
+    settingsOpen.value = false;
+  }
+  if (notificationsOpen.value && notificationsDropdownRef.value && !notificationsDropdownRef.value.contains(event.target as Node)) {
+    notificationsOpen.value = false;
+  }
 };
 
 const handleEscape = (event: KeyboardEvent) => {
-  if (event.key === "Escape") settingsOpen.value = false;
+  if (event.key === "Escape") {
+    settingsOpen.value = false;
+    notificationsOpen.value = false;
+  }
 };
 
 function resolveUrl(url: string) {
@@ -125,9 +141,35 @@ async function signOut() {
   }
 }
 
+// Collect all known menu paths so we can do longest-prefix matching
+const allMenuPaths = computed(() => {
+  const paths: string[] = [];
+  function collect(node: { to: string; children?: MenuNode[] }) {
+    if (node.to) paths.push(node.to);
+    if (node.children) node.children.forEach(collect);
+  }
+  for (const group of menuStore.resolvedMenu) {
+    for (const item of group.items) collect(item);
+  }
+  return paths;
+});
+
 function isActive(path: string): boolean {
   if (path === "/") return route.path === "/";
-  return route.path.startsWith(path);
+  // Exact match or route is under this path
+  if (route.path !== path && !route.path.startsWith(path + "/")) return false;
+  // Check that no OTHER more-specific menu path also matches
+  // (prevents /admin/kes from highlighting when /admin/kes/daftar is the real match)
+  for (const other of allMenuPaths.value) {
+    if (other === path) continue;
+    if (other.length > path.length && other.startsWith(path + "/")) {
+      // There is a more-specific sibling path — check if the current route matches it
+      if (route.path === other || route.path.startsWith(other + "/")) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 function itemClass(path: string) {
@@ -301,13 +343,51 @@ watch(
 
         <span class="h-full w-px bg-slate-200" />
 
-        <button
-          class="group relative flex h-full items-center px-4 text-slate-500 transition-colors hover:bg-[var(--accent-600)] hover:text-white"
-        >
-          <Bell class="h-4 w-4" />
-          <span class="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white" />
-          <span class="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-xs text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">Notifications</span>
-        </button>
+        <div ref="notificationsDropdownRef" class="relative flex h-full items-stretch">
+          <button
+            class="group relative flex h-full items-center px-4 text-slate-500 transition-colors hover:bg-[var(--accent-600)] hover:text-white"
+            @click.stop="notificationsOpen = !notificationsOpen"
+          >
+            <Bell class="h-4 w-4" />
+            <span class="absolute right-1.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-white ring-2 ring-white">5</span>
+            <span class="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-xs text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">Notifications</span>
+          </button>
+
+          <div
+            v-if="notificationsOpen"
+            class="absolute right-0 top-full z-50 mt-2 w-80 rounded-lg border border-slate-200 bg-white shadow-lg"
+          >
+            <div class="border-b border-slate-100 px-4 py-2.5">
+              <p class="text-sm font-semibold text-slate-900">Notifikasi</p>
+            </div>
+            <div class="max-h-80 overflow-y-auto">
+              <div
+                v-for="item in notificationItems"
+                :key="item.id"
+                class="flex items-start gap-3 border-b border-slate-50 px-4 py-3 transition-colors hover:bg-slate-50"
+              >
+                <div
+                  class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+                  :class="item.type === 'sla-warning' ? 'bg-rose-50 text-rose-500'
+                    : item.type === 'filing' ? 'bg-blue-50 text-blue-500'
+                    : item.type === 'reminder' ? 'bg-amber-50 text-amber-500'
+                    : item.type === 'award' ? 'bg-emerald-50 text-emerald-500'
+                    : 'bg-violet-50 text-violet-500'"
+                >
+                  <component :is="item.icon" class="h-4 w-4" />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm text-slate-700" :class="item.unread ? 'font-medium' : ''">{{ item.title }}</p>
+                  <p class="mt-0.5 text-xs text-slate-400">{{ item.time }}</p>
+                </div>
+                <span v-if="item.unread" class="mt-2 h-2 w-2 shrink-0 rounded-full bg-blue-500" />
+              </div>
+            </div>
+            <div class="border-t border-slate-100 px-4 py-2.5 text-center">
+              <button class="text-sm font-medium text-[var(--accent-600)] hover:text-[var(--accent-700)]">Lihat Semua</button>
+            </div>
+          </div>
+        </div>
 
         <span class="h-full w-px bg-slate-200" />
 
