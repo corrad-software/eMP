@@ -46,7 +46,8 @@ RUN apk add --no-cache \
         intl \
         opcache \
     && apk del $PHPIZE_DEPS \
-    && rm -rf /tmp/*
+    && rm -rf /tmp/* \
+    && rm -f /etc/nginx/http.d/default.conf
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -76,7 +77,8 @@ RUN composer dump-autoload --optimize --classmap-authoritative --no-dev
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R ug+rwx /var/www/html/storage /var/www/html/bootstrap/cache
 
-COPY docker/nginx/default.conf /etc/nginx/http.d/default.conf
+RUN mkdir -p /etc/nginx/templates
+COPY docker/nginx/default.conf /etc/nginx/templates/default.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
